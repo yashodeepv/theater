@@ -15,6 +15,7 @@ public class Mapper {
 
     public TheatreDTO toDto(Theatre theatre) {
         return TheatreDTO.builder()
+                .id(theatre.getId())
                 .location(theatre.getLocation())
                 .seatingCapacity(theatre.getSeatingCapacity())
                 .name(theatre.getName())
@@ -22,8 +23,19 @@ public class Mapper {
                 .build();
     }
 
+    public TheatreDTO toDto(Theatre theatre, Movie movie) {
+        return TheatreDTO.builder()
+                .id(theatre.getId())
+                .location(theatre.getLocation())
+                .seatingCapacity(theatre.getSeatingCapacity())
+                .name(theatre.getName())
+                .showtimes(theatre.getShowtimes().stream().map(this::toDto).filter(a -> movie.getTitle().equalsIgnoreCase(a.getMovie().getTitle())).collect(Collectors.toList()))
+                .build();
+    }
+
     public MovieDTO toDto(Movie movie) {
         return MovieDTO.builder()
+                .id(movie.getId())
                 .genre(movie.getGenre())
                 .language(movie.getLanguage())
                 .title(movie.getTitle())
@@ -31,6 +43,7 @@ public class Mapper {
     }
     public ShowtimeDTO toDto(Showtime showtime) {
         return ShowtimeDTO.builder()
+                .id(showtime.getId())
                 .movie(toDto(showtime.getMovie()))
                 .showDate(showtime.getShowDate())
                 .build();

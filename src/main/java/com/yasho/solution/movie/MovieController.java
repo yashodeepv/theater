@@ -23,13 +23,13 @@ public class MovieController {
         this.mapper = mapper;
     }
 
-    @GetMapping("/{movieId}/showtimes/theatres")
+    @GetMapping("/showtimes/theatres")
     public ResponseEntity<List<TheatreDTO>> getTheatresByMovieAndDate(
             @RequestParam String movieName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         List<TheatreDTO> theatres = movieService.getTheatresByMovieAndDate(movieName, fromDate, toDate)
-                .stream().map(mapper::toDto).collect(Collectors.toList());
+                .stream().map(a -> mapper.toDto(a, movieService.getMovieByTitle(movieName))).collect(Collectors.toList());
         return ResponseEntity.ok(theatres);
     }
 
@@ -37,6 +37,5 @@ public class MovieController {
     public List<MovieDTO> getAllMovies() {
         return movieService.getMovies().stream().map(mapper::toDto).collect(Collectors.toList());
     }
-
 
 }

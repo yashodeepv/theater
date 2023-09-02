@@ -23,29 +23,26 @@ public class BookingService {
 
     private final BookingRepo bookingRepo;
 
-    private final OfferRepository offerRepository;
-
     private final SeatRepo seatRepo;
 
-    public BookingService(MovieRepo movieRepo, TheatreRepo theatreRepo, ShowtimeRepo showtimeRepo, BookingRepo bookingRepo, OfferRepository offerRepository, SeatRepo seatRepo) {
+    public BookingService(MovieRepo movieRepo, TheatreRepo theatreRepo, ShowtimeRepo showtimeRepo, BookingRepo bookingRepo, SeatRepo seatRepo) {
         this.movieRepo = movieRepo;
         this.theatreRepo = theatreRepo;
         this.showtimeRepo = showtimeRepo;
         this.bookingRepo = bookingRepo;
-        this.offerRepository = offerRepository;
         this.seatRepo = seatRepo;
     }
 
 
     public BookingDTO bookTicketsWithDiscount(BookingDTO bookingDTO) throws BookingException {
         Movie movie = movieRepo.findByTitle(bookingDTO.getMovieTitle())
-                .orElseThrow(() -> new BookingException("Invalid movie ID"));
+                .orElseThrow(() -> new BookingException("Invalid movie"));
 
         Theatre theatre = theatreRepo.findByName(bookingDTO.getTheatre())
-                .orElseThrow(() -> new BookingException("Invalid theatre ID"));
+                .orElseThrow(() -> new BookingException("Invalid theatre"));
 
-        Showtime showtime = showtimeRepo.findByMovieAndShowDate(movie, LocalDateTime.parse(bookingDTO.getShowtime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .orElseThrow(() -> new BookingException("Invalid showtime ID"));
+        Showtime showtime = showtimeRepo.findByMovieAndShowDate(movie, bookingDTO.getShowtime())
+                .orElseThrow(() -> new BookingException("Invalid showtime"));
 
         List<Seat> seats = bookingDTO.getSeatNumber().stream().map(a -> seatRepo.findByShowtimeAndSeatNumber(showtime, a)).filter(Optional::isPresent).map(a -> a.orElseThrow(() -> new RuntimeException("Missing sear"))).collect(Collectors.toList());
 

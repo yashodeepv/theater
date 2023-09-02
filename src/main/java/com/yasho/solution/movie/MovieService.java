@@ -48,7 +48,9 @@ public class MovieService {
         return movieRepo.findAll();
     }
 
-
+    public Movie getMovieByTitle(String movieTitle) {
+        return movieRepo.findByTitle(movieTitle).orElseThrow(() -> new RuntimeException("Movie Not found"));
+    }
 
 
 }

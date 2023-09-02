@@ -18,7 +18,10 @@ public class BookingDTO {
     private Long id;
     private String movieTitle;
     private String theatre;
-    private String showtime;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime showtime;
+
     private List<Integer> seatNumber;
     private double totalAmount;
     private double discountAmount;

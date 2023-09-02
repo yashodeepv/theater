@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TheatreDTO {
+    private Long id;
     private String name;
     private String location;
     private int seatingCapacity;

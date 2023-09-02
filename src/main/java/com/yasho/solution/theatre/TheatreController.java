@@ -1,36 +1,50 @@
 package com.yasho.solution.theatre;
 
+import com.yasho.solution.Mapper;
+import com.yasho.solution.dto.OfferDTO;
+import com.yasho.solution.dto.ShowtimeDTO;
+import com.yasho.solution.dto.TheatreDTO;
 import com.yasho.solution.entity.Showtime;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yasho.solution.entity.Theatre;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/theatres")
 public class TheatreController {
 
-    @Autowired
-    private TheatreService theatreService;
-
-    @PostMapping("/{theatreId}/create-showtime")
-    public ResponseEntity<Showtime> createShowtime(
-            @PathVariable Long theatreId,
-            @RequestParam Long movieId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime showDateTime,
-            @RequestParam(name = "price") Integer price) {
-        Showtime showtime = theatreService.createShowtime(theatreId, movieId, showDateTime, price);
-        return ResponseEntity.ok(showtime);
+    private final TheatreService theatreService;
+    private final Mapper mapper;
+    public TheatreController(TheatreService theatreService, Mapper mapper) {
+        this.theatreService = theatreService;
+        this.mapper = mapper;
     }
 
-    @PutMapping("/update-showtime/{showtimeId}")
-    public ResponseEntity<Showtime> updateShowtime(
+    @GetMapping
+    public ResponseEntity<List<TheatreDTO>> getAllTheaters() {
+        List<TheatreDTO> allTheaters = theatreService.getAllTheaters().stream().map(mapper::toDto).toList();
+        return ResponseEntity.ok(allTheaters);
+    }
+
+
+    @PostMapping("/{theatreId}/create-showtime")
+    public ResponseEntity<ShowtimeDTO> createShowtime(@PathVariable Long theatreId, @RequestBody ShowtimeDTO showtimeDTO) {
+        Showtime showtime = theatreService.createShowtime(showtimeDTO.getTheatre().getName(), showtimeDTO.getMovie().getTitle(), showtimeDTO.getShowDate(), showtimeDTO.getTicketPrice(), showtimeDTO.getOffers());
+        return ResponseEntity.ok(mapper.toDto(showtime));
+    }
+
+    @PutMapping("/{theatreId}/update-showtime/{showtimeId}")
+    public ResponseEntity<ShowtimeDTO> updateShowtime(
+            @PathVariable Long theatreId,
             @PathVariable Long showtimeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime newShowDateTime) {
         Showtime showtime = theatreService.updateShowtime(showtimeId, newShowDateTime);
-        return ResponseEntity.ok(showtime);
+        return ResponseEntity.ok(mapper.toDto(showtime));
     }
 
     @DeleteMapping("/delete-showtime/{showtimeId}")

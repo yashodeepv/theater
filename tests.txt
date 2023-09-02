@@ -1,0 +1,69 @@
+// Simple offer scenarios
+// afternoon show 50% discount
+{
+  "movieTitle": "Oppenheimer",
+  "theatre": "PVR",
+  "showtime": "2023-08-10T13:00:00",
+  "seatNumber": [
+    2,3,4
+  ]
+}
+
+// 2+1
+{
+  "movieTitle": "Golmaal",
+  "theatre": "INOX",
+  "showtime": "2023-07-10T18:00:00",
+  "seatNumber": [
+    2,3,4
+  ]
+}
+
+
+
+
+// create showtime
+2
+{
+  "showDate": "2023-09-02T18:30:00",
+  "movie": {
+    "title": "Oppenheimer"
+  },
+  "theatre": {
+    "name": "INOX"
+  },
+  "ticketPrice": 1000,
+  "offers": [
+    {
+      "offerName": "thirdTicketFree",
+      "discountPercentage": 1,
+      "offerType": "THIRD_TICKET_DISCOUNT",
+      "startDate": "2023-09-02",
+      "endDate": "2025-09-02"
+    }
+  ]
+}
+
+// no discount
+{
+  "movieTitle": "Oppenheimer",
+  "theatre": "INOX",
+  "showtime": "2023-09-02T18:30:00",
+  "seatNumber": [
+    2,3
+  ]
+}
+
+// update showtime
+4
+2023-09-02T14:30:00
+
+// should get discount
+{
+  "movieTitle": "Oppenheimer",
+  "theatre": "INOX",
+  "showtime": "2023-09-02T14:30:00",
+  "seatNumber": [
+    7,8,9
+  ]
+}

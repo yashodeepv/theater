@@ -1,41 +1,69 @@
 package com.yasho.solution.theatre;
 
-import com.yasho.solution.entity.Movie;
-import com.yasho.solution.entity.Showtime;
-import com.yasho.solution.entity.Theatre;
-import com.yasho.solution.repo.MovieRepo;
-import com.yasho.solution.repo.ShowtimeRepo;
-import com.yasho.solution.repo.TheatreRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yasho.solution.dto.OfferDTO;
+import com.yasho.solution.entity.*;
+import com.yasho.solution.repo.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TheatreService {
 
-    @Autowired
-    private TheatreRepo theatreRepository;
+    private final TheatreRepo theatreRepository;
 
-    @Autowired
-    private ShowtimeRepo showtimeRepository;
+    private final ShowtimeRepo showtimeRepository;
 
-    @Autowired
-    private MovieRepo movieRepository;
+    private final MovieRepo movieRepository;
 
-    public Showtime createShowtime(Long theatreId, Long movieId, LocalDateTime showDateTime, Integer price) {
-        Theatre theatre = theatreRepository.findById(theatreId)
-                .orElseThrow(() -> new RuntimeException("Theatre not found with ID: " + theatreId));
+    private final SeatRepo seatRepo;
 
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Movie not found with ID: " + movieId));
+    private final OfferRepository offerRepository;
+
+    public TheatreService(TheatreRepo theatreRepository, ShowtimeRepo showtimeRepository, MovieRepo movieRepository, SeatRepo seatRepo, OfferRepository offerRepository) {
+        this.theatreRepository = theatreRepository;
+        this.showtimeRepository = showtimeRepository;
+        this.movieRepository = movieRepository;
+        this.seatRepo = seatRepo;
+        this.offerRepository = offerRepository;
+    }
+
+
+    public List<Theatre> getAllTheaters() {
+        return theatreRepository.findAll();
+    }
+
+    public Showtime createShowtime(String theatreName, String movieTitle, LocalDateTime showDateTime, Integer price, List<OfferDTO> offers1) {
+        Theatre theatre = theatreRepository.findByName(theatreName)
+                .orElseThrow(() -> new RuntimeException("Theatre not found: " + theatreName));
+
+        Movie movie = movieRepository.findByTitle(movieTitle)
+                .orElseThrow(() -> new RuntimeException("Movie not found : " + movieTitle));
 
         Showtime showtime = new Showtime();
         showtime.setTheatre(theatre);
         showtime.setMovie(movie);
         showtime.setShowDate(showDateTime);
         showtime.setTicketPrice(price);
-        return showtimeRepository.save(showtime);
+
+        List<Offer> offers = offers1.stream().map(a -> Offer.builder().offerName(a.getOfferName())
+                .offerType(a.getOfferType())
+                .startDate(a.getStartDate())
+                .discountPercentage(a.getDiscountPercentage())
+                .endDate(a.getEndDate())
+                .build()).toList();
+
+        for(Offer offer : offers) {
+            offerRepository.saveAndFlush(offer);
+        }
+        showtime.setOffers(offers);
+
+        Showtime showtime1 = showtimeRepository.save(showtime);
+        for(int i = 0; i < theatre.getSeatingCapacity(); i++) {
+            seatRepo.saveAndFlush(Seat.builder().seatNumber(i+1).isAvailable(true).showtime(showtime1).build());
+        }
+        return showtime1;
     }
 
     public Showtime updateShowtime(Long showtimeId, LocalDateTime newShowDateTime) {
