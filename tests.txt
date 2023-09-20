@@ -19,11 +19,8 @@
   ]
 }
 
-
-
-
 // create showtime
-2
+2 - theatre id
 {
   "showDate": "2023-09-02T18:30:00",
   "movie": {
@@ -55,7 +52,8 @@
 }
 
 // update showtime
-4
+2 - theatreid
+4 - showtimeid
 2023-09-02T14:30:00
 
 // should get discount

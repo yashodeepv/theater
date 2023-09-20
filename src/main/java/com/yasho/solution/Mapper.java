@@ -41,6 +41,7 @@ public class Mapper {
                 .title(movie.getTitle())
                 .build();
     }
+
     public ShowtimeDTO toDto(Showtime showtime) {
         return ShowtimeDTO.builder()
                 .id(showtime.getId())
